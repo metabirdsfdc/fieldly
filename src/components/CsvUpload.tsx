@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { API_BASE_URL } from "../config/api";
 
 type StatusType = "idle" | "loading" | "success" | "error";
 
@@ -31,9 +32,9 @@ export default function CsvUpload() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:3000/api/deploy/csv", {
+      const res = await fetch(`${API_BASE_URL}/api/deploy/csv`, {
         method: "POST",
-        body: formData,
+        body: formData
       });
 
       const data = await res.json();

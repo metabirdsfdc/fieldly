@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { API_BASE_URL } from "../config/api";
 
 type Credentials = {
   username: string;
@@ -9,7 +10,7 @@ type Credentials = {
 const EMPTY_FORM: Credentials = {
   username: "",
   password: "",
-  securityToken: "",
+  securityToken: ""
 };
 
 type MessageType = "success" | "error" | "";
@@ -30,7 +31,7 @@ export default function CredentialsForm() {
   const [showFormToken, setShowFormToken] = useState(false);
 
   useEffect(() => {
-    fetch("/api/credentials")
+    fetch(`${API_BASE_URL}/api/credentials`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.username) {
@@ -55,10 +56,10 @@ export default function CredentialsForm() {
     setMessageType("");
 
     try {
-      const res = await fetch("/api/credentials", {
+      const res = await fetch(`${API_BASE_URL}/api/credentials`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(form)
       });
 
       const data = await res.json();
@@ -85,8 +86,8 @@ export default function CredentialsForm() {
     setMessageType("");
 
     try {
-      const res = await fetch("/api/credentials", {
-        method: "DELETE",
+      const res = await fetch(`${API_BASE_URL}/api/credentials`, {
+        method: "DELETE"
       });
 
       const data = await res.json();
