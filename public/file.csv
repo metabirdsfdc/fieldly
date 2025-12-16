@@ -1,0 +1,4 @@
+sobject,fieldName,label,type,length,values,required
+Account,Customer_Code__c,Customer Code,Text,50,,true
+Account,Priority__c,Priority,Picklist,,High|Medium|Low,false
+Contact,External_Id__c,External Id,Text,100,,false
