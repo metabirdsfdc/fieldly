@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { API_BASE_URL } from "../config/api";
 import { axiosClient } from "../lib/axiosClient";
 
 type Credentials = {
@@ -52,6 +53,7 @@ export default function CredentialsForm() {
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("API_BASE_URL", API_BASE_URL);
     setMessage("");
     setMessageType("");
 
