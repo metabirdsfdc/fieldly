@@ -59,6 +59,7 @@ export default function CredentialsForm() {
       axiosClient
         .post("/api/credentials", form)
         .then(() => {
+          console.log(axiosClient.getUri());
           setSaved(form);
           setForm(EMPTY_FORM);
           setMessage("Credentials saved successfully");
