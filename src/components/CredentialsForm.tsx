@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type Credentials = {
   username: string;
@@ -20,7 +20,7 @@ const API = axios.create({
   headers: {
     "Content-Type": "application/json"
   },
-  withCredentials: false // set true ONLY if using cookies
+  withCredentials: false
 });
 
 export default function CredentialsForm() {
@@ -45,27 +45,21 @@ export default function CredentialsForm() {
     }, 5000);
   };
 
-  /**
-   * GET credentials
-   */
-  //   useEffect(() => {
-  //     API.get("/request/v1/credentials")
-  //       .then((res) => {
-  //         if (res.data?.username) {
-  //           setSaved(res.data);
-  //         } else {
-  //           setSaved(null); // no credentials yet
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         console.error("Failed to fetch credentials:", err);
-  //         setSaved(null);
-  //       });
-  //   }, []);
+  useEffect(() => {
+    API.get("/request/v1/credentials")
+      .then((res) => {
+        if (res.data?.username) {
+          setSaved(res.data);
+        } else {
+          setSaved(null); // no credentials yet
+        }
+      })
+      .catch((err) => {
+        console.error("Failed to fetch credentials:", err);
+        setSaved(null);
+      });
+  }, []);
 
-  /**
-   * SAVE
-   */
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
@@ -85,9 +79,6 @@ export default function CredentialsForm() {
     }
   };
 
-  /**
-   * CLEAR
-   */
   const clear = async () => {
     setMessage("");
     setMessageType("");
