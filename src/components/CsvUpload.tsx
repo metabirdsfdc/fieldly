@@ -64,23 +64,33 @@ export default function CsvUpload() {
   };
 
   return (
-    <div className="border border-gray-300 p-4 rounded-md">
-      <h2 className="text-sm font-semibold mb-3">CSV Deploy</h2>
+    <div className="border border-neutral-300 dark:border-neutral-700 rounded-lg p-4 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
+      <h2 className="text-sm font-semibold mb-3 text-neutral-800 dark:text-neutral-200">
+        CSV Deploy
+      </h2>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         <input
           ref={fileInputRef}
           type="file"
           accept=".csv"
           disabled={status === "loading"}
           onChange={(e) => setFile(e.target.files?.[0] || null)}
-          className="text-sm"
+          className="text-sm text-neutral-700 dark:text-neutral-300
+                     file:border file:border-neutral-300 dark:file:border-neutral-700
+                     file:bg-neutral-100 dark:file:bg-neutral-800
+                     file:px-3 file:py-1 file:rounded-md
+                     hover:file:bg-neutral-200 dark:hover:file:bg-neutral-700
+                     transition"
         />
 
         <button
           onClick={upload}
           disabled={status === "loading"}
-          className="border border-gray-400 px-3 py-1 text-sm hover:bg-gray-100 disabled:opacity-50"
+          className="rounded-md border border-neutral-400 dark:border-neutral-600
+                     px-3 py-1 text-sm
+                     hover:bg-neutral-100 dark:hover:bg-neutral-800
+                     transition disabled:opacity-50"
         >
           {status === "loading" ? "Deploying…" : "Upload & Deploy"}
         </button>
@@ -89,10 +99,10 @@ export default function CsvUpload() {
           <p
             className={`text-xs ${
               status === "error"
-                ? "text-red-600"
+                ? "text-red-600 dark:text-red-400"
                 : status === "success"
-                ? "text-green-600"
-                : "text-gray-600"
+                ? "text-green-600 dark:text-green-400"
+                : "text-neutral-600 dark:text-neutral-400"
             }`}
           >
             {message}

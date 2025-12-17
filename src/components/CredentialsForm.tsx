@@ -51,13 +51,10 @@ export default function CredentialsForm() {
         if (res.data?.username) {
           setSaved(res.data);
         } else {
-          setSaved(null); // no credentials yet
+          setSaved(null);
         }
       })
-      .catch((err) => {
-        console.error("Failed to fetch credentials:", err);
-        setSaved(null);
-      });
+      .catch(() => setSaved(null));
   }, []);
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -67,7 +64,6 @@ export default function CredentialsForm() {
 
     try {
       await API.post("/request/v1/credentials", form);
-
       setSaved(form);
       setForm(EMPTY_FORM);
       setMessage("Credentials saved successfully");
@@ -85,7 +81,6 @@ export default function CredentialsForm() {
 
     try {
       await API.delete("/request/v1/credentials");
-
       setSaved(null);
       setShowPassword(false);
       setShowToken(false);
@@ -99,23 +94,27 @@ export default function CredentialsForm() {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 text-neutral-900 dark:text-neutral-100">
       {saved && (
-        <div className="border border-gray-300 p-4 rounded-md">
-          <h2 className="text-sm font-semibold mb-3">Saved Credentials</h2>
+        <div className="border border-neutral-300 dark:border-neutral-700 rounded-lg p-4 bg-neutral-50 dark:bg-neutral-800">
+          <h2 className="text-sm font-semibold mb-3 text-neutral-800 dark:text-neutral-200">
+            Saved Credentials
+          </h2>
 
-          <div className="space-y-2 text-sm">
+          <div className="space-y-2 text-sm text-neutral-700 dark:text-neutral-300">
             <div>
               <span className="font-medium">Username:</span> {saved.username}
             </div>
 
             <div className="flex items-center gap-2">
               <span className="font-medium">Password:</span>
-              <span>{showPassword ? saved.password : "••••••••"}</span>
+              <span className="font-mono tracking-wider">
+                {showPassword ? saved.password : "••••••••"}
+              </span>
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="text-xs text-blue-600 underline"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
               >
                 {showPassword ? "Hide" : "Show"}
               </button>
@@ -123,11 +122,13 @@ export default function CredentialsForm() {
 
             <div className="flex items-center gap-2">
               <span className="font-medium">Security Token:</span>
-              <span>{showToken ? saved.securityToken : "••••••••"}</span>
+              <span className="font-mono tracking-wider">
+                {showToken ? saved.securityToken : "••••••••"}
+              </span>
               <button
                 type="button"
                 onClick={() => setShowToken((v) => !v)}
-                className="text-xs text-blue-600 underline"
+                className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
               >
                 {showToken ? "Hide" : "Show"}
               </button>
@@ -136,7 +137,7 @@ export default function CredentialsForm() {
             <button
               type="button"
               onClick={clear}
-              className="mt-2 border border-red-400 px-3 py-1 text-xs text-red-600 hover:bg-red-50"
+              className="mt-3 border border-red-400 dark:border-red-500 text-red-600 dark:text-red-400 px-3 py-1 rounded-md text-xs hover:bg-red-50 dark:hover:bg-red-950 transition"
             >
               Clear Credentials
             </button>
@@ -144,14 +145,17 @@ export default function CredentialsForm() {
         </div>
       )}
 
-      <form onSubmit={submit} className="border border-gray-300 p-4 rounded-md">
-        <h2 className="text-sm font-semibold mb-3">
+      <form
+        onSubmit={submit}
+        className="border border-neutral-300 dark:border-neutral-700 rounded-lg p-4 bg-white dark:bg-neutral-900"
+      >
+        <h2 className="text-sm font-semibold mb-3 text-neutral-800 dark:text-neutral-200">
           Save / Update Credentials
         </h2>
 
-        <div className="space-y-2">
+        <div className="space-y-3">
           <input
-            className="w-full border border-gray-300 px-2 py-1 text-sm"
+            className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm"
             placeholder="Username"
             autoComplete="username"
             value={form.username}
@@ -160,18 +164,16 @@ export default function CredentialsForm() {
 
           <div className="flex items-center gap-2">
             <input
-              className="w-full border border-gray-300 px-2 py-1 text-sm"
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm"
               type={showFormPassword ? "text" : "password"}
               placeholder="Password"
-              autoComplete="no"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
-
             <button
               type="button"
               onClick={() => setShowFormPassword((v) => !v)}
-              className="text-xs text-blue-600 underline"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
             >
               {showFormPassword ? "Hide" : "Show"}
             </button>
@@ -179,20 +181,18 @@ export default function CredentialsForm() {
 
           <div className="flex items-center gap-2">
             <input
-              className="w-full border border-gray-300 px-2 py-1 text-sm"
+              className="w-full rounded-md border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 px-2 py-1 text-sm"
               type={showFormToken ? "text" : "password"}
               placeholder="Security Token"
-              autoComplete="not"
               value={form.securityToken}
               onChange={(e) =>
                 setForm({ ...form, securityToken: e.target.value })
               }
             />
-
             <button
               type="button"
               onClick={() => setShowFormToken((v) => !v)}
-              className="text-xs text-blue-600 underline"
+              className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
             >
               {showFormToken ? "Hide" : "Show"}
             </button>
@@ -200,7 +200,7 @@ export default function CredentialsForm() {
 
           <button
             type="submit"
-            className="border border-gray-400 px-3 py-1 text-sm"
+            className="rounded-md border border-neutral-400 dark:border-neutral-600 px-3 py-1 text-sm hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
           >
             Save Credentials
           </button>
@@ -208,7 +208,9 @@ export default function CredentialsForm() {
           {message && (
             <p
               className={`text-xs ${
-                messageType === "success" ? "text-green-600" : "text-red-600"
+                messageType === "success"
+                  ? "text-green-600 dark:text-green-400"
+                  : "text-red-600 dark:text-red-400"
               }`}
             >
               {message}
