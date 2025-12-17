@@ -31,10 +31,13 @@ export default function CsvUpload() {
     formData.append("file", file);
 
     try {
-      const res = await fetch(`https://fieldler.onrender.com/api/deploy/csv`, {
-        method: "POST",
-        body: formData
-      });
+      const res = await fetch(
+        `https://fieldler.onrender.com/request/deploy/csv`,
+        {
+          method: "POST",
+          body: formData
+        }
+      );
 
       const data = await res.json();
 

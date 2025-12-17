@@ -30,7 +30,7 @@ export default function CredentialsForm() {
   const [showFormToken, setShowFormToken] = useState(false);
 
   useEffect(() => {
-    fetch(`https://fieldler.onrender.com/api/credentials`)
+    fetch(`https://fieldler.onrender.com/request/credentials`)
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (data?.username) {
@@ -55,11 +55,14 @@ export default function CredentialsForm() {
     setMessageType("");
 
     try {
-      const res = await fetch(`https://fieldler.onrender.com/api/credentials`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form)
-      });
+      const res = await fetch(
+        `https://fieldler.onrender.com/request/credentials`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form)
+        }
+      );
 
       const data = await res.json();
 
@@ -85,9 +88,12 @@ export default function CredentialsForm() {
     setMessageType("");
 
     try {
-      const res = await fetch(`https://fieldler.onrender.com/api/credentials`, {
-        method: "DELETE"
-      });
+      const res = await fetch(
+        `https://fieldler.onrender.com/request/credentials`,
+        {
+          method: "DELETE"
+        }
+      );
 
       const data = await res.json();
 
