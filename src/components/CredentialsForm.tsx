@@ -1,6 +1,4 @@
 import { useEffect, useRef, useState } from "react";
-import { API_BASE_URL } from "../config/api";
-import { axiosClient } from "../lib/axiosClient";
 
 type Credentials = {
   username: string;
@@ -32,11 +30,11 @@ export default function CredentialsForm() {
   const [showFormToken, setShowFormToken] = useState(false);
 
   useEffect(() => {
-    axiosClient
-      .get("/api/credentials")
-      .then((res) => {
-        if (res.data?.username) {
-          setSaved(res.data);
+    fetch(`https://fieldler.onrender.com/api/credentials`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (data?.username) {
+          setSaved(data);
         }
       })
       .catch(() => {});
@@ -53,26 +51,28 @@ export default function CredentialsForm() {
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("API_BASE_URL", API_BASE_URL);
     setMessage("");
     setMessageType("");
 
     try {
-      axiosClient
-        .post("/api/credentials", form)
-        .then(() => {
-          console.log(axiosClient.getUri());
-          setSaved(form);
-          setForm(EMPTY_FORM);
-          setMessage("Credentials saved successfully");
-          setMessageType("success");
-        })
-        .catch((err) => {
-          setMessage(err.message || "Failed to save credentials");
-          setMessageType("error");
-          return;
-        });
+      const res = await fetch(`https://fieldler.onrender.com/api/credentials`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form)
+      });
 
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data?.message || "Failed to save credentials");
+        setMessageType("error");
+        return;
+      }
+
+      setSaved(form);
+      setForm(EMPTY_FORM);
+      setMessage("Credentials saved successfully");
+      setMessageType("success");
       clearMessageAfterDelay();
     } catch {
       setMessage("Network error");
@@ -85,7 +85,17 @@ export default function CredentialsForm() {
     setMessageType("");
 
     try {
-      await axiosClient.delete("/api/credentials");
+      const res = await fetch(`https://fieldler.onrender.com/api/credentials`, {
+        method: "DELETE"
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setMessage(data?.message || "Failed to clear credentials");
+        setMessageType("error");
+        return;
+      }
 
       setSaved(null);
       setShowPassword(false);
@@ -94,8 +104,8 @@ export default function CredentialsForm() {
       setMessage("Credentials cleared");
       setMessageType("success");
       clearMessageAfterDelay();
-    } catch (err: any) {
-      setMessage(err?.response?.data?.message || "Failed to clear credentials");
+    } catch {
+      setMessage("Network error");
       setMessageType("error");
     }
   };
