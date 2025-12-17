@@ -1,3 +1,4 @@
+import axios from "axios";
 import { useEffect, useRef, useState } from "react";
 
 type Credentials = {
@@ -14,115 +15,99 @@ const EMPTY_FORM: Credentials = {
 
 type MessageType = "success" | "error" | "";
 
+const API = axios.create({
+  baseURL: "https://fieldler.onrender.com",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  withCredentials: false // set true ONLY if using cookies
+});
+
 export default function CredentialsForm() {
   const [form, setForm] = useState<Credentials>(EMPTY_FORM);
   const [saved, setSaved] = useState<Credentials | null>(null);
-
   const [ping, setPing] = useState<any>();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showToken, setShowToken] = useState(false);
+  const [showFormPassword, setShowFormPassword] = useState(false);
+  const [showFormToken, setShowFormToken] = useState(false);
 
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<MessageType>("");
 
   const timeoutRef = useRef<number | null>(null);
 
-  const [showFormPassword, setShowFormPassword] = useState(false);
-  const [showFormToken, setShowFormToken] = useState(false);
-
-  useEffect(() => {
-    fetch(`https://fieldler.onrender.com/request/v1/credentials`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        if (data?.username) {
-          setSaved(data);
-        }
-      })
-      .catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    fetch(`https://fieldler.onrender.com/request/v1/ping`)
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => {
-        setPing(data);
-      })
-      .catch(() => {});
-  }, []);
-
   const clearMessageAfterDelay = () => {
     if (timeoutRef.current) clearTimeout(timeoutRef.current);
-
     timeoutRef.current = window.setTimeout(() => {
       setMessage("");
       setMessageType("");
     }, 5000);
   };
 
+  /**
+   * GET credentials
+   */
+  useEffect(() => {
+    API.get("/request/v1/credentials")
+      .then((res) => {
+        if (res.data?.username) {
+          setSaved(res.data);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  /**
+   * PING
+   */
+  useEffect(() => {
+    API.get("/request/v1/ping")
+      .then((res) => setPing(res.data))
+      .catch(() => {});
+  }, []);
+
+  /**
+   * SAVE
+   */
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
     setMessageType("");
 
     try {
-      const res = await fetch(
-        `https://fieldler.onrender.com/request/v1/credentials`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form)
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setMessage(data?.message || "Failed to save credentials");
-        setMessageType("error");
-        return;
-      }
+      await API.post("/request/v1/credentials", form);
 
       setSaved(form);
       setForm(EMPTY_FORM);
       setMessage("Credentials saved successfully");
       setMessageType("success");
       clearMessageAfterDelay();
-    } catch {
-      setMessage("Network error");
+    } catch (err: any) {
+      setMessage(err.response?.data?.message || "Failed to save credentials");
       setMessageType("error");
     }
   };
 
+  /**
+   * CLEAR
+   */
   const clear = async () => {
     setMessage("");
     setMessageType("");
 
     try {
-      const res = await fetch(
-        `https://fieldler.onrender.com/request/v1/credentials`,
-        {
-          method: "DELETE"
-        }
-      );
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        setMessage(data?.message || "Failed to clear credentials");
-        setMessageType("error");
-        return;
-      }
+      await API.delete("/request/v1/credentials");
 
       setSaved(null);
       setShowPassword(false);
       setShowToken(false);
-
       setMessage("Credentials cleared");
       setMessageType("success");
       clearMessageAfterDelay();
-    } catch {
-      setMessage("Network error");
+    } catch (err: any) {
+      setMessage(err.response?.data?.message || "Failed to clear credentials");
       setMessageType("error");
     }
   };
@@ -180,7 +165,7 @@ export default function CredentialsForm() {
 
         <div className="space-y-2">
           <input
-            className="w-full border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:border-2 focus:border-blue-600"
+            className="w-full border border-gray-300 px-2 py-1 text-sm"
             placeholder="Username"
             value={form.username}
             onChange={(e) => setForm({ ...form, username: e.target.value })}
@@ -188,18 +173,16 @@ export default function CredentialsForm() {
 
           <div className="flex items-center gap-2">
             <input
-              className="w-full border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:border-2 focus:border-blue-600"
+              className="w-full border border-gray-300 px-2 py-1 text-sm"
               type={showFormPassword ? "text" : "password"}
               placeholder="Password"
-              autoComplete="current-password"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
-
             <button
               type="button"
               onClick={() => setShowFormPassword((v) => !v)}
-              className="text-xs text-blue-600 underline whitespace-nowrap"
+              className="text-xs text-blue-600 underline"
             >
               {showFormPassword ? "Hide" : "Show"}
             </button>
@@ -207,7 +190,7 @@ export default function CredentialsForm() {
 
           <div className="flex items-center gap-2">
             <input
-              className="w-full border border-gray-300 px-2 py-1 text-sm focus:outline-none focus:border-2 focus:border-blue-600"
+              className="w-full border border-gray-300 px-2 py-1 text-sm"
               type={showFormToken ? "text" : "password"}
               placeholder="Security Token"
               value={form.securityToken}
@@ -215,11 +198,10 @@ export default function CredentialsForm() {
                 setForm({ ...form, securityToken: e.target.value })
               }
             />
-
             <button
               type="button"
               onClick={() => setShowFormToken((v) => !v)}
-              className="text-xs text-blue-600 underline whitespace-nowrap"
+              className="text-xs text-blue-600 underline"
             >
               {showFormToken ? "Hide" : "Show"}
             </button>
@@ -227,7 +209,7 @@ export default function CredentialsForm() {
 
           <button
             type="submit"
-            className="border border-gray-400 px-3 py-1 text-sm hover:bg-gray-100"
+            className="border border-gray-400 px-3 py-1 text-sm"
           >
             Save Credentials
           </button>
@@ -241,7 +223,8 @@ export default function CredentialsForm() {
               {message}
             </p>
           )}
-          {ping && <p className={`text-xs text-blue-600`}>{ping}</p>}
+
+          {ping && <p className="text-xs text-blue-600">{ping}</p>}
         </div>
       </form>
     </div>
