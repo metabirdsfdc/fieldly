@@ -55,7 +55,20 @@ export default function CredentialsForm() {
           setSaved(res.data);
         }
       })
-      .catch(() => {});
+      .catch((err) => {
+        // optional UX: show message only if needed
+        const msg = err.response?.data?.error || err.response?.data?.message;
+
+        if (msg) {
+          setMessage(msg);
+          setMessageType("error");
+          clearMessageAfterDelay();
+        }
+      });
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
+    };
   }, []);
 
   /**
@@ -157,6 +170,7 @@ export default function CredentialsForm() {
           <input
             className="w-full border border-gray-300 px-2 py-1 text-sm"
             placeholder="Username"
+            autoComplete="username"
             value={form.username}
             onChange={(e) => setForm({ ...form, username: e.target.value })}
           />
@@ -166,9 +180,11 @@ export default function CredentialsForm() {
               className="w-full border border-gray-300 px-2 py-1 text-sm"
               type={showFormPassword ? "text" : "password"}
               placeholder="Password"
+              autoComplete="no"
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
+
             <button
               type="button"
               onClick={() => setShowFormPassword((v) => !v)}
@@ -183,11 +199,13 @@ export default function CredentialsForm() {
               className="w-full border border-gray-300 px-2 py-1 text-sm"
               type={showFormToken ? "text" : "password"}
               placeholder="Security Token"
+              autoComplete="not"
               value={form.securityToken}
               onChange={(e) =>
                 setForm({ ...form, securityToken: e.target.value })
               }
             />
+
             <button
               type="button"
               onClick={() => setShowFormToken((v) => !v)}
@@ -213,7 +231,6 @@ export default function CredentialsForm() {
               {message}
             </p>
           )}
-
         </div>
       </form>
     </div>
