@@ -18,6 +18,8 @@ export default function CredentialsForm() {
   const [form, setForm] = useState<Credentials>(EMPTY_FORM);
   const [saved, setSaved] = useState<Credentials | null>(null);
 
+  const [ping, setPing] = useState<any>();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showToken, setShowToken] = useState(false);
 
@@ -36,6 +38,15 @@ export default function CredentialsForm() {
         if (data?.username) {
           setSaved(data);
         }
+      })
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    fetch(`https://fieldler.onrender.com/request/v1/ping`)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        setPing(data);
       })
       .catch(() => {});
   }, []);
@@ -230,6 +241,7 @@ export default function CredentialsForm() {
               {message}
             </p>
           )}
+          {ping && <p className={`text-xs text-blue-600`}>{ping}</p>}
         </div>
       </form>
     </div>
