@@ -32,7 +32,7 @@ export default function CsvUpload() {
 
     try {
       const res = await fetch(
-        `https://fieldler.onrender.com/request/deploy/csv`,
+        `https://fieldler.onrender.com/request/v1/deploy/csv`,
         {
           method: "POST",
           body: formData
