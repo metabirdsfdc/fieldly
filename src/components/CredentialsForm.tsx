@@ -16,7 +16,7 @@ const EMPTY_FORM: Credentials = {
 type MessageType = "success" | "error" | "";
 
 const API = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: "https://fieldler.vercel.app/",
   headers: {
     "Content-Type": "application/json"
   },
