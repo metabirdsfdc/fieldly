@@ -53,22 +53,14 @@ export default function CredentialsForm() {
       .then((res) => {
         if (res.data?.username) {
           setSaved(res.data);
+        } else {
+          setSaved(null); // no credentials yet
         }
       })
       .catch((err) => {
-        // optional UX: show message only if needed
-        const msg = err.response?.data?.error || err.response?.data?.message;
-
-        if (msg) {
-          setMessage(msg);
-          setMessageType("error");
-          clearMessageAfterDelay();
-        }
+        console.error("Failed to fetch credentials:", err);
+        setSaved(null);
       });
-
-    return () => {
-      if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    };
   }, []);
 
   /**
