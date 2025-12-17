@@ -16,7 +16,7 @@ const EMPTY_FORM: Credentials = {
 type MessageType = "success" | "error" | "";
 
 const API = axios.create({
-  baseURL: "https://fieldler.onrender.com",
+  baseURL: "http://localhost:3000",
   headers: {
     "Content-Type": "application/json"
   },
@@ -26,7 +26,6 @@ const API = axios.create({
 export default function CredentialsForm() {
   const [form, setForm] = useState<Credentials>(EMPTY_FORM);
   const [saved, setSaved] = useState<Credentials | null>(null);
-  const [ping, setPing] = useState<any>();
 
   const [showPassword, setShowPassword] = useState(false);
   const [showToken, setShowToken] = useState(false);
@@ -56,15 +55,6 @@ export default function CredentialsForm() {
           setSaved(res.data);
         }
       })
-      .catch(() => {});
-  }, []);
-
-  /**
-   * PING
-   */
-  useEffect(() => {
-    API.get("/request/v1/ping")
-      .then((res) => setPing(res.data))
       .catch(() => {});
   }, []);
 
@@ -223,8 +213,6 @@ export default function CredentialsForm() {
               {message}
             </p>
           )}
-
-          {ping && <p className="text-xs text-blue-600">{ping}</p>}
         </div>
       </form>
     </div>
