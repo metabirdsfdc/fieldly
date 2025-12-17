@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 type Credentials = {
   username: string;
@@ -48,20 +48,20 @@ export default function CredentialsForm() {
   /**
    * GET credentials
    */
-//   useEffect(() => {
-//     API.get("/request/v1/credentials")
-//       .then((res) => {
-//         if (res.data?.username) {
-//           setSaved(res.data);
-//         } else {
-//           setSaved(null); // no credentials yet
-//         }
-//       })
-//       .catch((err) => {
-//         console.error("Failed to fetch credentials:", err);
-//         setSaved(null);
-//       });
-//   }, []);
+  //   useEffect(() => {
+  //     API.get("/request/v1/credentials")
+  //       .then((res) => {
+  //         if (res.data?.username) {
+  //           setSaved(res.data);
+  //         } else {
+  //           setSaved(null); // no credentials yet
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.error("Failed to fetch credentials:", err);
+  //         setSaved(null);
+  //       });
+  //   }, []);
 
   /**
    * SAVE
