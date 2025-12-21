@@ -1,42 +1,36 @@
 import { useRef, useState } from "react";
 
-type StatusType = "idle" | "loading" | "success" | "error";
+type Status = "idle" | "loading" | "success" | "error";
 
 export default function CsvUpload() {
   const [file, setFile] = useState<File | null>(null);
-  const [status, setStatus] = useState<StatusType>("idle");
-  const [message, setMessage] = useState<string>("");
+  const [status, setStatus] = useState<Status>("idle");
+  const [message, setMessage] = useState("");
 
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const timeoutRef = useRef<number | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const clearFileInput = () => {
+  const reset = () => {
     setFile(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+    if (inputRef.current) inputRef.current.value = "";
   };
 
   const upload = async () => {
     if (!file) {
       setStatus("error");
-      setMessage("Please select a CSV file");
+      setMessage("Select a CSV file to continue");
       return;
     }
 
     setStatus("loading");
     setMessage("Deploying CSV…");
 
-    const formData = new FormData();
-    formData.append("file", file);
+    const form = new FormData();
+    form.append("file", file);
 
     try {
       const res = await fetch(
-        `https://fieldler.onrender.com/request/v1/deploy/csv`,
-        {
-          method: "POST",
-          body: formData
-        }
+        "https://fieldler.onrender.com/request/v1/deploy/csv",
+        { method: "POST", body: form }
       );
 
       const data = await res.json();
@@ -44,53 +38,68 @@ export default function CsvUpload() {
       if (!res.ok) {
         setStatus("error");
         setMessage(data?.error || "Deployment failed");
-        clearFileInput();
+        reset();
         return;
       }
 
       setStatus("success");
       setMessage("Deployment completed successfully");
-      clearFileInput();
-
-      timeoutRef.current = window.setTimeout(() => {
-        setStatus("idle");
-        setMessage("");
-      }, 5000);
+      reset();
     } catch {
       setStatus("error");
       setMessage("Network or server error");
-      clearFileInput();
+      reset();
     }
   };
 
   return (
-    <div className="border border-neutral-300 dark:border-neutral-700 rounded-lg p-4 bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100">
-      <h2 className="text-sm font-semibold mb-3 text-neutral-800 dark:text-neutral-200">
-        CSV Deploy
-      </h2>
+    <div className="w-full h-full flex items-center justify-center">
+      <section className="w-full max-w-xl border border-slate-300 rounded-xl bg-white p-7 space-y-6">
+        <header className="space-y-1">
+          <h2 className="text-sm font-medium text-slate-900">Deploy CSV</h2>
+          <p className="text-xs text-slate-500">
+            Upload a properly formatted CSV to deploy metadata.
+          </p>
+        </header>
 
-      <div className="space-y-4">
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".csv"
-          disabled={status === "loading"}
-          onChange={(e) => setFile(e.target.files?.[0] || null)}
-          className="text-sm text-neutral-700 dark:text-neutral-300
-                     file:border file:border-neutral-300 dark:file:border-neutral-700
-                     file:bg-neutral-100 dark:file:bg-neutral-800
-                     file:px-3 file:py-1 file:rounded-md
-                     hover:file:bg-neutral-200 dark:hover:file:bg-neutral-700
-                     transition"
-        />
+        <label
+          htmlFor="csv"
+          className={`
+            flex flex-col items-center justify-center gap-2
+            border border-dashed rounded-xl p-6 cursor-pointer
+            transition
+            ${
+              status === "loading"
+                ? "border-slate-300 bg-slate-50"
+                : "border-blue-300 hover:border-blue-500"
+            }
+          `}
+        >
+          <input
+            ref={inputRef}
+            id="csv"
+            type="file"
+            accept=".csv"
+            disabled={status === "loading"}
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
+            className="hidden"
+          />
+
+          <span className="text-sm text-slate-700">
+            {file ? file.name : "Click to upload CSV"}
+          </span>
+
+          <span className="text-xs text-slate-500">
+            {file
+              ? `${(file.size / 1024).toFixed(1)} KB`
+              : "Only .csv files are supported"}
+          </span>
+        </label>
 
         <button
           onClick={upload}
           disabled={status === "loading"}
-          className="rounded-md border border-neutral-400 dark:border-neutral-600
-                     px-3 py-1 text-sm
-                     hover:bg-neutral-100 dark:hover:bg-neutral-800
-                     transition disabled:opacity-50"
+          className="w-full rounded-xl bg-orange-600 text-white py-3 text-sm font-medium transition hover:bg-orange-700 disabled:opacity-50"
         >
           {status === "loading" ? "Deploying…" : "Upload & Deploy"}
         </button>
@@ -98,17 +107,17 @@ export default function CsvUpload() {
         {status !== "idle" && (
           <p
             className={`text-xs ${
-              status === "error"
-                ? "text-red-600 dark:text-red-400"
-                : status === "success"
-                ? "text-green-600 dark:text-green-400"
-                : "text-neutral-600 dark:text-neutral-400"
+              status === "success"
+                ? "text-green-600"
+                : status === "error"
+                ? "text-red-600"
+                : "text-slate-600"
             }`}
           >
             {message}
           </p>
         )}
-      </div>
+      </section>
     </div>
   );
 }
