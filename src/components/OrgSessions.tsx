@@ -1,14 +1,11 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { PrimaryButton } from "../components/ui/Buttons";
 import { CredentialsModal } from "./CredentialsModal";
 
-type Session = {
-  username: string;
-};
+type Session = { username: string };
 
-const API = axios.create({
-  baseURL: "https://fieldler.onrender.com"
-});
+const API = axios.create({ baseURL: "http://localhost:3000" });
 
 export default function OrgSessions() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -20,42 +17,54 @@ export default function OrgSessions() {
       .catch(() => setSessions([]));
   };
 
-  useEffect(load, []);
+  useEffect(() => {
+    load();
+  }, []);
 
   return (
     <div className="w-full flex justify-center">
-      <section className="w-full max-w-3xl space-y-6">
-        <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <section className="w-full md:max-w-3xl space-y-6 rounded-2xl bg-[#F6FFF8] p-4 md:p-8">
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 className="text-sm font-medium text-slate-900">
+            <h2 className="text-base font-semibold text-slate-900">
               Connected Orgs
             </h2>
-            <p className="text-xs text-slate-500">
+            <p className="text-sm text-slate-600">
               Manage active Salesforce sessions
             </p>
           </div>
 
-          <button
+          <PrimaryButton
+            className="sm:w-auto w-full"
             onClick={() => setOpen(true)}
-            className="rounded-xl bg-orange-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-orange-700 sm:w-auto w-full"
           >
             Add Session
-          </button>
+          </PrimaryButton>
         </header>
 
         {sessions.length === 0 ? (
-          <div className="border border-slate-300 rounded-xl p-6 text-sm text-slate-500 text-center">
-            No org sessions connected yet.
+          <div className="rounded-xl bg-[#E9F8E7] p-8 text-center">
+            <p className="text-sm font-medium text-slate-600">
+              No org sessions connected
+            </p>
+            <p className="mt-1 text-xs text-slate-500">
+              Add a Salesforce org to start deploying metadata
+            </p>
           </div>
         ) : (
-          <div className="border border-slate-300 rounded-xl divide-y">
+          <div className="divide-y rounded-xl bg-[#F6FFF8]">
             {sessions.map((s, i) => (
               <div
                 key={i}
-                className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between px-5 py-4 text-sm"
+                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-6 py-4"
               >
-                <span className="text-slate-900 break-all">{s.username}</span>
-                <span className="text-xs text-green-600">Active</span>
+                <span className="text-sm font-medium text-slate-900 break-all">
+                  {s.username}
+                </span>
+                <span className="inline-flex items-center gap-2 text-xs font-medium text-green-600">
+                  <span className="h-2 w-2 rounded-full bg-green-500" />
+                  Active
+                </span>
               </div>
             ))}
           </div>

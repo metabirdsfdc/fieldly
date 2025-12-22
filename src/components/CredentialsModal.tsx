@@ -1,5 +1,6 @@
 import axios from "axios";
 import { useRef, useState } from "react";
+import { PrimaryButton } from "../components/ui/Buttons";
 
 type Credentials = {
   username: string;
@@ -16,24 +17,18 @@ const EMPTY_FORM: Credentials = {
 type MessageType = "success" | "error" | "";
 
 const API = axios.create({
-  baseURL: "https://fieldler.onrender.com",
+  baseURL: "http://localhost:3000",
   headers: { "Content-Type": "application/json" }
 });
 
-type Props = {
-  open: boolean;
-  onClose: () => void;
-  onSaved: () => void;
-};
+type Props = { open: boolean; onClose: () => void; onSaved: () => void };
 
 export function CredentialsModal({ open, onClose, onSaved }: Props) {
   const [form, setForm] = useState<Credentials>(EMPTY_FORM);
   const [message, setMessage] = useState("");
   const [messageType, setMessageType] = useState<MessageType>("");
-
   const [showPassword, setShowPassword] = useState(false);
   const [showToken, setShowToken] = useState(false);
-
   const timeoutRef = useRef<number | null>(null);
 
   const clearLater = () => {
@@ -61,53 +56,55 @@ export function CredentialsModal({ open, onClose, onSaved }: Props) {
     }
   };
 
+  const inputClass = "flex-1 text-sm outline-none bg-transparent w-full";
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 px-5 md:px-0">
-      <div className="w-full max-w-lg rounded-xl bg-white border border-slate-300 p-6">
-        <header className="flex items-center justify-between mb-5">
-          <h2 className="text-sm font-medium text-slate-900">
+      <div className="w-full max-w-lg rounded-2xl bg-[#F6FFF8] border border-slate-200 p-8">
+        <header className="flex items-center justify-between mb-6">
+          <h2 className="text-base font-semibold text-slate-900">
             Add Salesforce Session
           </h2>
           <button
             onClick={onClose}
-            className="text-xs text-slate-500 hover:text-slate-900"
+            className="text-sm text-slate-500 hover:text-slate-900 transition"
           >
             Close
           </button>
         </header>
 
         <form onSubmit={submit} className="space-y-4">
-          <div className="border border-slate-300 rounded-xl px-3 py-2 focus-within:border-blue-600 transition">
+          <div className="border border-slate-200 rounded-xl px-4 py-3 focus-within:border-yellow-400 transition">
             <input
-              className="w-full text-sm outline-none bg-transparent"
+              className={inputClass}
               placeholder="Username"
               value={form.username}
               onChange={(e) => setForm({ ...form, username: e.target.value })}
             />
           </div>
 
-          <div className="flex items-center gap-2 border border-slate-300 rounded-xl px-3 py-2 focus-within:border-blue-600 transition">
+          <div className="flex items-center gap-2 border border-slate-200 rounded-xl px-4 py-3 focus-within:border-yellow-400 transition">
             <input
               type={showPassword ? "text" : "password"}
               placeholder="Password"
-              className="flex-1 text-sm outline-none bg-transparent"
+              className={inputClass}
               value={form.password}
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
             <button
               type="button"
               onClick={() => setShowPassword((v) => !v)}
-              className="text-xs text-blue-600"
+              className="text-xs text-yellow-600 font-medium"
             >
               {showPassword ? "Hide" : "Show"}
             </button>
           </div>
 
-          <div className="flex items-center gap-2 border border-slate-300 rounded-xl px-3 py-2 focus-within:border-blue-600 transition">
+          <div className="flex items-center gap-2 border border-slate-200 rounded-xl px-4 py-3 focus-within:border-yellow-400 transition">
             <input
               type={showToken ? "text" : "password"}
               placeholder="Security Token"
-              className="flex-1 text-sm outline-none bg-transparent"
+              className={inputClass}
               value={form.securityToken}
               onChange={(e) =>
                 setForm({ ...form, securityToken: e.target.value })
@@ -116,18 +113,15 @@ export function CredentialsModal({ open, onClose, onSaved }: Props) {
             <button
               type="button"
               onClick={() => setShowToken((v) => !v)}
-              className="text-xs text-blue-600"
+              className="text-xs text-yellow-600 font-medium"
             >
               {showToken ? "Hide" : "Show"}
             </button>
           </div>
 
-          <button
-            type="submit"
-            className="w-full rounded-xl bg-blue-600 text-white py-2.5 text-sm font-medium hover:bg-blue-700 transition"
-          >
+          <PrimaryButton type="submit" className="w-full sm:w-auto">
             Save Session
-          </button>
+          </PrimaryButton>
 
           {message && (
             <p

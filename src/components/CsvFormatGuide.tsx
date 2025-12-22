@@ -1,20 +1,19 @@
 export default function CsvFormatGuide() {
   return (
-    <section className="border border-slate-300 rounded-xl bg-white p-6 space-y-6">
+    <section className="rounded-2xl bg-[#F6FFF8] p-6 space-y-6">
       <h2 className="text-sm font-medium text-slate-900">CSV Format Guide</h2>
-
       <p className="text-sm text-slate-600">
         The CSV must match the required column structure exactly.
       </p>
 
       <div className="overflow-x-auto">
-        <table className="w-full text-xs border border-slate-300">
+        <table className="w-full text-xs border border-slate-200">
           <thead className="bg-slate-100 text-slate-700">
             <tr>
               {["Column", "Required", "Description", "Example"].map((h) => (
                 <th
                   key={h}
-                  className="border border-slate-300 px-3 py-2 text-left font-medium"
+                  className="border border-slate-200 px-2 py-1 text-left font-medium"
                 >
                   {h}
                 </th>
@@ -35,7 +34,7 @@ export default function CsvFormatGuide() {
                 {row.map((cell, i) => (
                   <td
                     key={i}
-                    className="border border-slate-300 px-3 py-2 text-slate-700"
+                    className="border border-slate-200 px-2 py-1 text-slate-700"
                   >
                     {cell}
                   </td>
@@ -48,11 +47,9 @@ export default function CsvFormatGuide() {
 
       <div>
         <p className="text-sm font-medium text-slate-900 mb-2">Sample CSV</p>
-        <pre className="text-xs bg-white border border-slate-300 rounded-xl p-3 text-slate-800 overflow-x-auto">
-          sobject,fieldName,label,type,length,values,required
-          <br />
-          Account,Customer_Code__c,Customer Code,Text,50,,true
-          <br />
+        <pre className="text-xs bg-white border border-slate-200 rounded-xl p-3 text-slate-800 overflow-x-auto">
+          sobject,fieldName,label,type,length,values,required{"\n"}
+          Account,Customer_Code__c,Customer Code,Text,50,,true{"\n"}
           Account,Status__c,Status,Picklist,,New;Active;Closed,false
         </pre>
       </div>
