@@ -49,7 +49,7 @@ export default function AuthSlide({ open, onClose }: AuthSlideProps) {
     }));
   };
 
-  const BASE_URL = "http://localhost:3000/api/auth";
+  const BASE_URL = `${import.meta.env.VITE_BASE_URL}/api/auth`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
