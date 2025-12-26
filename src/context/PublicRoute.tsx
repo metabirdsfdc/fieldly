@@ -8,8 +8,7 @@ const PublicRoute = () => {
 
   if (loading) return <PageSpinner />;
 
-  const isAuthenticated =
-    !!authState.accessToken && !!authState.refreshToken && !!authState.user;
+  const isAuthenticated = !!authState.accessToken && !!authState.user;
 
   if (isAuthenticated) {
     return <Navigate to="/app" replace />;

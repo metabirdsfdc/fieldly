@@ -9,12 +9,11 @@ import { useNavigate } from "react-router-dom";
 
 export interface User {
   fullName: string;
-  username: string;
+  email: string;
 }
 
 interface AuthState {
   accessToken: string | null;
-  refreshToken: string | null;
   user: User | null;
 }
 
@@ -31,7 +30,7 @@ interface AuthContextType {
 }
 
 export const AuthContext = createContext<AuthContextType>({
-  authState: { accessToken: null, refreshToken: null, user: null },
+  authState: { accessToken: null, user: null },
   login: () => {},
   logout: () => {},
   isAuthenticated: false,
@@ -47,7 +46,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const [authState, setAuthState] = useState<AuthState>({
     accessToken: null,
-    refreshToken: null,
     user: null
   });
 
@@ -56,16 +54,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     try {
       const accessToken = localStorage.getItem("access_token");
-      const refreshToken = localStorage.getItem("refresh_token");
       const userRaw = localStorage.getItem("user");
 
-      if (!accessToken || !refreshToken || !userRaw) return;
+      if (!accessToken || !userRaw) return;
 
       const user = JSON.parse(userRaw) as User;
 
       setAuthState({
         accessToken,
-        refreshToken,
         user
       });
     } catch (err) {
@@ -79,12 +75,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = useCallback(
     (data: { accessToken: string; refreshToken: string; user: User }) => {
       localStorage.setItem("access_token", data.accessToken);
-      localStorage.setItem("refresh_token", data.refreshToken);
       localStorage.setItem("user", JSON.stringify(data.user));
 
       setAuthState({
         accessToken: data.accessToken,
-        refreshToken: data.refreshToken,
         user: data.user
       });
 
@@ -95,7 +89,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = useCallback(() => {
     localStorage.clear();
-    setAuthState({ accessToken: null, refreshToken: null, user: null });
+    setAuthState({ accessToken: null, user: null });
     navigate("/", { replace: true });
   }, [navigate]);
 

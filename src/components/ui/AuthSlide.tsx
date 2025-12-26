@@ -49,6 +49,8 @@ export default function AuthSlide({ open, onClose }: AuthSlideProps) {
     }));
   };
 
+  const BASE_URL = "http://localhost:3000/api/auth";
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -56,22 +58,21 @@ export default function AuthSlide({ open, onClose }: AuthSlideProps) {
 
     try {
       const url = mode === "login" ? "/login" : "/signup";
-      const finalUrl = `${"BASE_URL"}${url}`;
+      const finalUrl = `${BASE_URL}${url}`;
       console.log(finalUrl);
       const payload =
         mode === "login"
-          ? { username: form.email, password: form.password }
+          ? { email: form.email, password: form.password }
           : {
               fullName: form.fullName,
-              username: form.email,
+              email: form.email,
               password: form.password
             };
 
-      const { data } = await axios.post(`${"BASE_URL"}${url}`, payload, {
-        withCredentials: true
-      });
+      const { data } = await axios.post(`${BASE_URL}${url}`, payload);
 
-      login(data);
+      console.log("Data", data.data);
+      login(data.data);
       onClose();
       window.location.href = "/app";
     } catch (err: any) {

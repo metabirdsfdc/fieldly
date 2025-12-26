@@ -3,12 +3,14 @@ import { useRef, useState } from "react";
 import { PrimaryButton } from "../components/ui/Buttons";
 
 type Credentials = {
+  orgName: string;
   username: string;
   password: string;
   securityToken: string;
 };
 
 const EMPTY_FORM: Credentials = {
+  orgName: "",
   username: "",
   password: "",
   securityToken: ""
@@ -18,7 +20,10 @@ type MessageType = "success" | "error" | "";
 
 const API = axios.create({
   baseURL: "http://localhost:3000",
-  headers: { "Content-Type": "application/json" }
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    "Content-Type": "application/json"
+  }
 });
 
 type Props = { open: boolean; onClose: () => void; onSaved: () => void };
@@ -43,6 +48,7 @@ export function CredentialsModal({ open, onClose, onSaved }: Props) {
 
   const submit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    console.log("Cliecked");
     try {
       await API.post("/request/v1/credentials", form);
       setForm(EMPTY_FORM);
@@ -74,6 +80,14 @@ export function CredentialsModal({ open, onClose, onSaved }: Props) {
         </header>
 
         <form onSubmit={submit} className="space-y-4">
+          <div className="border border-slate-200 rounded-xl px-4 py-3 focus-within:border-yellow-400 transition">
+            <input
+              className={inputClass}
+              placeholder="Org Name"
+              value={form.orgName}
+              onChange={(e) => setForm({ ...form, orgName: e.target.value })}
+            />
+          </div>
           <div className="border border-slate-200 rounded-xl px-4 py-3 focus-within:border-yellow-400 transition">
             <input
               className={inputClass}

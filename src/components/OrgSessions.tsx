@@ -1,25 +1,56 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
+import { backendApi } from "../api/api";
 import { PrimaryButton } from "../components/ui/Buttons";
 import { CredentialsModal } from "./CredentialsModal";
 
-type Session = { username: string };
-
-const API = axios.create({ baseURL: "http://localhost:3000" });
+type Session = {
+  _id: string;
+  username: string;
+  orgName?: string;
+  active: boolean;
+};
 
 export default function OrgSessions() {
   const [sessions, setSessions] = useState<Session[]>([]);
   const [open, setOpen] = useState(false);
 
   const load = () => {
-    API.get("/request/v1/credentials")
-      .then((res) => setSessions(res.data?.username ? [res.data] : []))
+    backendApi
+      .get("/request/v1/credentials")
+      .then((res) => {
+        setSessions(Array.isArray(res.data) ? res.data : []);
+      })
       .catch(() => setSessions([]));
   };
 
   useEffect(() => {
     load();
   }, []);
+
+  const handleDelete = async (id: string) => {
+    try {
+      await backendApi.delete(`/request/v1/credentials/${id}`);
+
+      setSessions((prev) => prev.filter((s) => s._id !== id));
+    } catch (err) {
+      console.error("Failed to delete credential", err);
+    }
+  };
+
+  const handleActivate = async (id: string) => {
+    try {
+      await backendApi.patch(`/request/v1/credentials/${id}/activate`);
+
+      setSessions((prev) =>
+        prev.map((s) => ({
+          ...s,
+          active: s._id === id
+        }))
+      );
+    } catch (err) {
+      console.error("Failed to activate session", err);
+    }
+  };
 
   return (
     <div className="w-full flex justify-center">
@@ -42,33 +73,55 @@ export default function OrgSessions() {
           </PrimaryButton>
         </header>
 
-        {sessions.length === 0 ? (
-          <div className="rounded-xl bg-[#E9F8E7] p-8 text-center">
-            <p className="text-sm font-medium text-slate-600">
-              No org sessions connected
-            </p>
-            <p className="mt-1 text-xs text-slate-500">
-              Add a Salesforce org to start deploying metadata
-            </p>
-          </div>
-        ) : (
-          <div className="divide-y rounded-xl bg-[#F6FFF8]">
-            {sessions.map((s, i) => (
-              <div
-                key={i}
-                className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between px-6 py-4"
-              >
-                <span className="text-sm font-medium text-slate-900 break-all">
-                  {s.username}
+        {sessions.map((s) => (
+          <div
+            key={s._id}
+            className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between px-6 py-4 border-b last:border-b-0"
+          >
+            <div className="flex flex-col">
+              {s.orgName && (
+                <span className="text-xs font-medium text-black">
+                  {s.orgName}
                 </span>
+              )}
+              <span className="text-xs text-slate-500 break-all">
+                {s.username}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              {s.active && (
                 <span className="inline-flex items-center gap-2 text-xs font-medium text-green-600">
                   <span className="h-2 w-2 rounded-full bg-green-500" />
                   Active
                 </span>
-              </div>
-            ))}
+              )}
+
+              {!s.active && (
+                <button
+                  onClick={() => handleActivate(s._id)}
+                  className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100 transition"
+                >
+                  Use this
+                </button>
+              )}
+
+              {/* <button
+                onClick={() => handleEdit(s)}
+                className="rounded-md border border-slate-300 px-3 py-1 text-xs font-medium text-slate-700 hover:bg-slate-100 transition"
+              >
+                Update
+              </button> */}
+
+              <button
+                onClick={() => handleDelete(s._id)}
+                className="text-xs font-medium text-red-600 hover:text-red-700 transition"
+              >
+                Delete
+              </button>
+            </div>
           </div>
-        )}
+        ))}
 
         <CredentialsModal
           open={open}

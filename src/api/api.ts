@@ -1,0 +1,27 @@
+import axios from "axios";
+
+export const backendApi = axios.create({
+  baseURL: "http://localhost:3000",
+  headers: {
+    "Content-Type": "application/json"
+  }
+});
+
+backendApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem("access_token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+backendApi.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      localStorage.removeItem("access_token");
+      window.location.href = "/";
+    }
+    return Promise.reject(error);
+  }
+);

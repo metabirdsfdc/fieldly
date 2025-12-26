@@ -11,9 +11,7 @@ const ProtectedRoute = () => {
   }
 
   const isValidSession =
-    Boolean(authState.accessToken) &&
-    Boolean(authState.refreshToken) &&
-    Boolean(authState.user);
+    Boolean(authState.accessToken) && Boolean(authState.user);
 
   if (!isValidSession) {
     return <Navigate to="/" replace />;

@@ -1,4 +1,5 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { uploadApi } from "../api/upload.api";
 import { PrimaryButton } from "../components/ui/Buttons";
 
 type Status = "idle" | "loading" | "success" | "error";
@@ -14,12 +15,20 @@ export default function CsvUpload() {
     if (inputRef.current) inputRef.current.value = "";
   };
 
+  useEffect(() => {
+    if (message) {
+      const timer = setTimeout(() => setMessage(""), 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [message]);
+
   const upload = async () => {
     if (!file) {
       setStatus("error");
       setMessage("Select a CSV file to continue");
       return;
     }
+
     setStatus("loading");
     setMessage("Deploying CSV…");
 
@@ -27,23 +36,26 @@ export default function CsvUpload() {
     form.append("file", file);
 
     try {
-      const res = await fetch(
-        "https://fieldler.onrender.com/request/v1/deploy/csv",
-        { method: "POST", body: form }
-      );
-      const data = await res.json();
-      if (!res.ok) {
-        setStatus("error");
-        setMessage(data?.error || "Deployment failed");
-        reset();
-        return;
-      }
+      const res = await uploadApi.post("/request/v1/deploy/csv", form, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      const data = res.data;
+
       setStatus("success");
-      setMessage("Deployment completed successfully");
+      setMessage(data?.message || "Deployment completed successfully");
       reset();
-    } catch {
+    } catch (error: any) {
       setStatus("error");
-      setMessage("Network or server error");
+
+      const errorMessage =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        "Network or server error";
+
+      setMessage(errorMessage);
       reset();
     }
   };
