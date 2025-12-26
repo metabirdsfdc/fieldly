@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const orgApi = axios.create({
-  baseURL: "http://localhost:3000",
+  baseURL: import.meta.env.VITE_BASE_URL,
   headers: {
     "Content-Type": "application/json"
   }
@@ -20,7 +20,7 @@ orgApi.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("access_token");
-      window.location.href = "/login";
+      window.location.href = "/";
     }
     return Promise.reject(error);
   }

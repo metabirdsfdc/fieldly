@@ -1,7 +1,7 @@
 import axios from "axios";
 
 export const uploadApi = axios.create({
-  baseURL: "http://localhost:3000"
+  baseURL: import.meta.env.VITE_BASE_URL
 });
 
 uploadApi.interceptors.request.use((config) => {
@@ -17,7 +17,7 @@ uploadApi.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("access_token");
-      window.location.href = "/login";
+      window.location.href = "/";
     }
     return Promise.reject(error);
   }
